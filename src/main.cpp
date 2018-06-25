@@ -18,9 +18,13 @@ using namespace std;
 using json = nlohmann::json;
 
 // For converting back and forth between radians and degrees.
-constexpr double pi() { return M_PI; }
+constexpr double pi() {
+  return M_PI;
+}
 
-constexpr double deg2rad( double x ) { return x * M_PI / 180.0 ; }
+constexpr double deg2rad( double x ) {
+  return x * M_PI / 180.0 ;
+}
 
 // double rad2deg(double x) { return x * 180 / pi(); }
 // Checks if the SocketIO event has JSON data.
@@ -43,7 +47,7 @@ string hasData(string s) {
 int main() {
 
 
-  uWS::Hub h , d ;
+  uWS::Hub h, d ;
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
@@ -64,15 +68,15 @@ int main() {
 
   // load each data into plan.road
   while (getline(in_map_, line)) {
-  	istringstream iss(line);
+    istringstream iss(line);
 
     MapWayPoint wp ;
 
-  	iss >> wp.x;
-  	iss >> wp.y;
-  	iss >> wp.s;
-  	iss >> wp.nx ;
-  	iss >> wp.ny ;
+    iss >> wp.x;
+    iss >> wp.y;
+    iss >> wp.s;
+    iss >> wp.nx ;
+    iss >> wp.ny ;
 
     plan.road.Add( wp ) ;
   }
@@ -80,7 +84,7 @@ int main() {
   // process map - compute splines etc
   plan.road.PreCalculate() ;
 
-  // set simulation clock 
+  // set simulation clock
   plan.t_now = 0.0 ;
 
   h.onMessage([&plan](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -100,100 +104,99 @@ int main() {
 
         if (event == "telemetry" ) {
 
-            // load all telemetry data into plan object.
+          // load all telemetry data into plan object.
 
 
 
-            // get previous x-points
-            auto  prev_x = j[1]["previous_path_x"] ;
+          // get previous x-points
+          auto  prev_x = j[1]["previous_path_x"] ;
 
-            // we don't actually use this data anymore
-            // as we already have it
-            // we are only interseted in how many points actually got used last time 
-            // 
+          // we don't actually use this data anymore
+          // as we already have it
+          // we are only interseted in how many points actually got used last time
+          //
 
-            /*
-            plan.prev_x = std::vector<double>(prev_x.begin() , prev_x.end() ) ;
+          /*
+          plan.prev_x = std::vector<double>(prev_x.begin() , prev_x.end() ) ;
 
-            // get previous y-points
-            auto prev_y = j[1]["previous_path_y"] ;
-            plan.prev_y = std::vector<double>(prev_y.begin() , prev_y.end() ) ;
+          // get previous y-points
+          auto prev_y = j[1]["previous_path_y"] ;
+          plan.prev_y = std::vector<double>(prev_y.begin() , prev_y.end() ) ;
 
-            plan.end_s  = (double) j[1]["end_path_s"] ;
-            plan.end_d  = (double) j[1]["end_path_d"] ;
-            */
+          plan.end_s  = (double) j[1]["end_path_s"] ;
+          plan.end_d  = (double) j[1]["end_path_d"] ;
+          */
 
-            plan.n_prev = prev_x.size() ;
+          plan.n_prev = prev_x.size() ;
 
-            //
-            // update the internal time reference
-            // if we generate n_next last time , and still have n_prev left to run
-            // then we must have gone ( n_next - n_prev ) timesteps ahead
-            //
-            // we experimented with using real time , but this method is accurate enougth for my purposes.
+          //
+          // update the internal time reference
+          // if we generate n_next last time , and still have n_prev left to run
+          // then we must have gone ( n_next - n_prev ) timesteps ahead
+          //
+          // we experimented with using real time , but this method is accurate enougth for my purposes.
 
-            plan.t_now  += ( plan.n_next - plan.n_prev ) * 0.02 ;
+          plan.t_now  += ( plan.n_next - plan.n_prev ) * 0.02 ;
 
-            // 
-            VehicleData car ;
+          //
+          VehicleData car ;
 
 
-            car.t     = plan.t_now   ;
-            car.x     = j[1]["x"]    ;
-            car.y     = j[1]["y"]    ;
-            car.s     = j[1]["s"]    ;
-            car.d     = j[1]["d"]    ;
-            // we could calculate these but not used 
-            car.vx    = 0.0 ;
-            car.vy    = 0.0 ;
-            // we don't need this all the time
-            //car.yaw   = deg2rad( j[1]["yaw"] )  ;
-            //
-            car.speed = double(  j[1]["speed"] ) * 0.44704 ;
+          car.t     = plan.t_now   ;
+          car.x     = j[1]["x"]    ;
+          car.y     = j[1]["y"]    ;
+          car.s     = j[1]["s"]    ;
+          car.d     = j[1]["d"]    ;
+          // we could calculate these but not used
+          car.vx    = 0.0 ;
+          car.vy    = 0.0 ;
+          // we don't need this all the time
+          //car.yaw   = deg2rad( j[1]["yaw"] )  ;
+          //
+          car.speed = double(  j[1]["speed"] ) * 0.44704 ;
 
-            // update self
-            plan.TrackVehicle( -1 , car ) ;
+          // update self
+          plan.TrackVehicle( -1, car ) ;
 
-            auto sensor_fusion_data = j[1]["sensor_fusion"] ;
+          auto sensor_fusion_data = j[1]["sensor_fusion"] ;
 
-            for ( auto &sf : sensor_fusion_data  )
-             {
+          for ( auto &sf : sensor_fusion_data  ) {
 //
-               car.t     = plan.t_now ;
-               car.x     = sf[1]  ;
-               car.y     = sf[2]  ;
-               car.vx    = sf[3]  ;
-               car.vy    = sf[4]  ;
-               car.s     = sf[5]  ;
-               car.d     = sf[6]  ;
-               // not required all the time so not computed
-               // car.speed = sqrt( car.vx * car.vx + car.vy * car.vy ) ;
-               //car.yaw   = atan2( car.vy , car.vx ) ;
+            car.t     = plan.t_now ;
+            car.x     = sf[1]  ;
+            car.y     = sf[2]  ;
+            car.vx    = sf[3]  ;
+            car.vy    = sf[4]  ;
+            car.s     = sf[5]  ;
+            car.d     = sf[6]  ;
+            // not required all the time so not computed
+            // car.speed = sqrt( car.vx * car.vx + car.vy * car.vy ) ;
+            //car.yaw   = atan2( car.vy , car.vx ) ;
 
-               // update the list of sensor fusion detected cars
-               // we assume ids are >=0
-               if ( sf[0] >= 0 )
-                    plan.TrackVehicle( sf[0] , car ) ;
+            // update the list of sensor fusion detected cars
+            // we assume ids are >=0
+            if ( sf[0] >= 0 )
+              plan.TrackVehicle( sf[0], car ) ;
 
-             }
+          }
 
-            // we have the data , now execute our planner
-            // to generate our x,y points 
+          // we have the data , now execute our planner
+          // to generate our x,y points
 
-            plan.Execute()    ;
+          plan.Execute()    ;
 
-            // send the x,y points generated to simulator
-            json msgJson;
-            msgJson["next_x"] = plan.next_x ;
-            msgJson["next_y"] = plan.next_y ;
-            auto msg = "42[\"control\","+ msgJson.dump()+"]" ;
-            ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          // send the x,y points generated to simulator
+          json msgJson;
+          msgJson["next_x"] = plan.next_x ;
+          msgJson["next_y"] = plan.next_y ;
+          auto msg = "42[\"control\","+ msgJson.dump()+"]" ;
+          ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
 
         }
       } else {
-          std::string msg = "42[\"manual\",{}]";
-          ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-     }
+        std::string msg = "42[\"manual\",{}]";
+        ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+      }
     }
   });
 
@@ -214,10 +217,10 @@ int main() {
     std::cout << "Connected!!!" << std::endl;
     //
     plan.Reset() ;
-});
+  });
 
   h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code,
-                         char *message, size_t length) {
+  char *message, size_t length) {
     ws.close();
     std::cout << "Disconnected" << std::endl;
   });

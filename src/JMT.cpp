@@ -1,4 +1,3 @@
-
 #include "JMT.hpp"
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
@@ -10,8 +9,7 @@ using Eigen::MatrixXd ;
 using Eigen::VectorXd ;
 
 
-void QuinticPath::JMT( double tBase , double Tperiod )
-{
+void QuinticPath::JMT( double tBase, double Tperiod ) {
   T = Tperiod ;
   t0 = tBase  ;
   t1 = t0 + T ;
@@ -52,28 +50,40 @@ void QuinticPath::JMT( double tBase , double Tperiod )
 
 }
 
-double QuinticPath::get( double t )
-{
-    t -= t0 ; if ( t > T ) t =T ; else if ( t < 0.0 ) t = 0.0 ;
-	return (((( poly[5] * t + poly[4] ) * t + poly[3] ) * t + poly[2] ) * t + poly[1] ) * t + poly[0] ;
+double QuinticPath::get( double t ) {
+  t -= t0 ;
+  if ( t > T )
+    t =T ;
+  else if ( t < 0.0 )
+    t = 0.0 ;
+  return (((( poly[5] * t + poly[4] ) * t + poly[3] ) * t + poly[2] ) * t + poly[1] ) * t + poly[0] ;
 }
 
-double QuinticPath::get1d( double t )
-{
-    t -= t0 ; if ( t > T ) t =T ; else if ( t < 0.0 ) t = 0.0 ;
-	return ((( 5.0 * poly[5] * t + 4.0 * poly[4] ) * t + 3.0*poly[3] ) * t + 2.0*poly[2] ) * t + poly[1]  ;
+double QuinticPath::get1d( double t ) {
+  t -= t0 ;
+  if ( t > T )
+    t =T ;
+  else if ( t < 0.0 )
+    t = 0.0 ;
+  return ((( 5.0 * poly[5] * t + 4.0 * poly[4] ) * t + 3.0*poly[3] ) * t + 2.0*poly[2] ) * t + poly[1]  ;
 }
 
-double QuinticPath::get2d( double t )
-{
-    t -= t0 ; if ( t > T ) t =T ; else if ( t < 0.0 ) t = 0.0 ;
-	return (( 20.0 * poly[5] * t + 12.0 * poly[4] ) * t + 6.0*poly[3] ) * t + 2 * poly[2]   ;
+double QuinticPath::get2d( double t ) {
+  t -= t0 ;
+  if ( t > T )
+    t =T ;
+  else if ( t < 0.0 )
+    t = 0.0 ;
+  return (( 20.0 * poly[5] * t + 12.0 * poly[4] ) * t + 6.0*poly[3] ) * t + 2 * poly[2]   ;
 }
 
-double QuinticPath::get3d( double t )
-{
-    t -= t0 ; if ( t > T ) t =T ; else if ( t < 0.0 ) t = 0.0 ;
-	return ( 60.0 * poly[5] * t + 24.0 * poly[4] ) * t + 6.0 *poly[3] ;
+double QuinticPath::get3d( double t ) {
+  t -= t0 ;
+  if ( t > T )
+    t =T ;
+  else if ( t < 0.0 )
+    t = 0.0 ;
+  return ( 60.0 * poly[5] * t + 24.0 * poly[4] ) * t + 6.0 *poly[3] ;
 }
 
 // return [-1,+1] => [-inf,+inf]

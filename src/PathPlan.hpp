@@ -16,109 +16,112 @@ using namespace std ;
 
 
 struct Target {
-    public:
-        int mode                     ;
-        int fid                      ;
-        double s_target,d_target     ;
-        double keep,keep_inc         ;
-        double stuck                 ;
+ public:
+  int mode                     ;
+  int fid                      ;
+  double s_target,d_target     ;
+  double keep,keep_inc         ;
+  double stuck                 ;
 } ;
 
 
 class Trajectory {
-	private:
+ private:
 
-	public:
-        bool    bad              ;
-        int     mode             ;
-        QuinticPath s , d        ;
-        double score	         ;
+ public:
+  bool    bad              ;
+  int     mode             ;
+  QuinticPath s, d        ;
+  double score	         ;
 
-	public:
+ public:
 
-		Trajectory() { bad = true ; mode = 0 ;  score = 0 ; }
+  Trajectory() {
+    bad = true ;
+    mode = 0 ;
+    score = 0 ;
+  }
 
 } ;
 
 class PathPlan {
 
-	//
-	// lazy programming - i've made everything public
-	//
+  //
+  // lazy programming - i've made everything public
+  //
 
-	public:
-
-
-		double MoveForward( VehicleData & , double , double ) ;
-
-        VehicleTracker *GetNear(  int side , int rank  ) ;
-
-        void  JMT( double start[3] , double end[3] , double T , double result[6] ) ;
-
-        bool MakeNewPath( Trajectory &best ) ;
-        bool CheckTrajectory( Trajectory &test ) ;
+ public:
 
 
-        int state    		  ;
-        MapData road 		  ;
-        double t_now 	  	  ;
+  double MoveForward( VehicleData &, double, double ) ;
 
-        int n_prev   		  ;
-        vector<double> prev_x ;
-        vector<double> prev_y ;
+  VehicleTracker *GetNear(  int side, int rank  ) ;
 
-        int n_next   ;
-        vector<double> next_x ;
-        vector<double> next_y ;
+  void  JMT( double start[3], double end[3], double T, double result[6] ) ;
 
-        double end_s ;
-        double end_d ;
-        // sensor fusion vehicles by id
-        unordered_map <int,VehicleTracker> vtrack ;
-
-        // map of vehicles relative to us
-        struct near_t
-        {
-        	int id      ;
-        	double s ;
-        } nearmap[3][4] ;
-
-        // previous given locations
-        VehicleTracker ego ;
+  bool MakeNewPath( Trajectory &best ) ;
+  bool CheckTrajectory( Trajectory &test ) ;
 
 
-        void TrackVehicle( int id , VehicleData v ) ;
+  int state    		  ;
+  MapData road 		  ;
+  double t_now 	  	  ;
 
-        // keep last (MAX_POINTS) vehicle positions generated
-        VehicleData v_prev[MAX_POINTS] ;
-        // current location to generate from
-        VehicleData v_now              ;
+  int n_prev   		  ;
+  vector<double> prev_x ;
+  vector<double> prev_y ;
 
-        Trajectory traj 	       ;
-        Target target              ;
+  int n_next   ;
+  vector<double> next_x ;
+  vector<double> next_y ;
 
-        int vote_lc_l   ;
-        double score_l  ;
-        int vote_lc_r   ;
-        double score_r  ;
+  double end_s ;
+  double end_d ;
+  // sensor fusion vehicles by id
+  unordered_map <int,VehicleTracker> vtrack ;
 
-        int VoteLaneChange( int vote , int offset ) ;
-        double ScoreLane( int offset , int current_lane_no ) ;
-        double WorthLaneChange( int offset ) ;
-        void SetTargetLane( int offset ) ;
+  // map of vehicles relative to us
+  struct near_t {
+    int id      ;
+    double s ;
+  } nearmap[3][4] ;
 
-        void UpdateTarget( )  ;
-        void UpdatePlan()  	 ;
+  // previous given locations
+  VehicleTracker ego ;
 
-        void Execute() ;
 
-        void Reset() ;
+  void TrackVehicle( int id, VehicleData v ) ;
 
-	public:
+  // keep last (MAX_POINTS) vehicle positions generated
+  VehicleData v_prev[MAX_POINTS] ;
+  // current location to generate from
+  VehicleData v_now              ;
 
-        PathPlan() ;
+  Trajectory traj 	       ;
+  Target target              ;
 
-        void Debug() ;
+  int vote_lc_l   ;
+  double score_l  ;
+  int vote_lc_r   ;
+  double score_r  ;
+
+  int VoteLaneChange( int vote, int offset ) ;
+  double ScoreLane( int offset, int current_lane_no ) ;
+  double WorthLaneChange( int offset ) ;
+  void SetTargetLane( int offset ) ;
+
+  void UpdateTarget( )  ;
+  void UpdatePlan()  	 ;
+
+  void Execute() ;
+
+  void Reset() ;
+
+ public:
+
+  PathPlan() ;
+
+  void Debug() ;
 
 
 } ;

@@ -8,50 +8,48 @@
 // simple vehicle data class
 class VehicleData {
 
-	public:
-        double t     ;
-		double x  	 ;
-		double y  	 ;
-		double vx 	 ;
-		double vy 	 ;
-		double s  	 ;
-		double d     ;
-		double yaw   ;
-		double speed ;
+ public:
+  double t     ;
+  double x  	 ;
+  double y  	 ;
+  double vx 	 ;
+  double vy 	 ;
+  double s  	 ;
+  double d     ;
+  double yaw   ;
+  double speed ;
 
-	public :
+ public :
 
-		VehicleData()
-		{
-			t = x = y = vx = vy = s = d = yaw = speed = 0.0 ;
-		}
+  VehicleData() {
+    t = x = y = vx = vy = s = d = yaw = speed = 0.0 ;
+  }
 
 } ;
 
 
 class VehicleTracker {
 
-	public:
-		int id 				;
-		int nu         		;
-		int l_lane , c_lane , r_lane ;
+ public:
+  int id 				;
+  int nu         		;
+  int l_lane, c_lane, r_lane ;
 
-		double dist 	    ;
+  double dist 	    ;
 
-        VehicleData latest   ;
-        VehicleData last4[4] ;
+  VehicleData latest   ;
+  VehicleData last4[4] ;
 
-		VehicleTracker()
-		{
-			 id = -999        ;
-			 nu = 0           ;
+  VehicleTracker() {
+    id = -999        ;
+    nu = 0           ;
 
-		} ;
+  } ;
 
-        // get ith previous vehicle data
-		void  Update( const MapData m , VehicleData v ) ;
+  // get ith previous vehicle data
+  void  Update( const MapData m, VehicleData v ) ;
 
-        double EstimateSpeed() ;
+  double EstimateSpeed() ;
 
 
 
