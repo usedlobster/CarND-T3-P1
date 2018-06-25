@@ -97,26 +97,26 @@ bool PathPlan::CheckTrajectory( Trajectory &k  ) {
     if (  s_jerk_t > MAX_JERK )
       return false ;
 
-    sum_jerk += s_jerk_t  ;
+    // sum_jerk += s_jerk_t  ;
 
     s_acc_t = fabs( k.s.get2d( t )) ;
     if (  s_acc_t > MAX_ACCEL )
       return false ;
 
-    sum_acc += s_acc_t  ;
+    // sum_acc += s_acc_t  ;
 
     sd_t = k.s.get1d( t ) ;
     if ( sd_t < 0 || sd_t > MAX_SPEED )
       return false ;
 
-    sum_sdot += ( sd_t )  ;
+    // sum_sdot += ( sd_t )  ;
 
   }
 
 
   // how near to s_target :-
   k.score  = 10 *  fabs( target.s_target - s1 )  ;
-  k.score +=  fabs( target.d_target - d1 ) ;
+  k.score +=       fabs( target.d_target - d1 ) ;
 
 
   return true ; // trajectory seems ok !
@@ -183,7 +183,7 @@ bool PathPlan::MakeNewPath(  Trajectory &best ) {
     double Tp,smax ;
 
     Tp = Peturb( 6.0, 4.0, 2.0, 10.0  )  ;
-    smax = a.s.ic[0] + ( Tp )  * 0.5*( a.s.ic[1] + MAX_SPEED ) ;
+    smax = a.s.ic[0] + ( Tp )  * 0.5 * ( a.s.ic[1] + MAX_SPEED ) ;
 
     if ( f != nullptr  ) {
       // estimate where the car in front will be in Tp seconds from now
@@ -193,18 +193,18 @@ bool PathPlan::MakeNewPath(  Trajectory &best ) {
       double s1 = f1 - ( target.keep + 0.3 * f_speed ) ;
       target.s_target = std::min( smax, s1 ) ;
     } else
-      target.s_target = a.s.ic[0] + ( 0.5 * ( a.s.ic[1] + MAX_SPEED ) * Tp ) ;
+      target.s_target =  smax ;
 
     // peturb end conditions
     for ( int i = 0 ; i < 20 ; i++ ) {
       a.s.ec[2] = ( !(i&1) ) ? a.s.ic[2]  : Peturb( a.s.ic[2], 5.0, -10.0, 10.0 ) ;
 
       if ( f == nullptr  ) {
-        a.s.ec[1] = (!i ) ? MAX_SPEED : PeturbDown( MAX_SPEED, MAX_SPEED, 0, MAX_SPEED ) ;
-        a.s.ec[0] = (!i ) ? target.s_target : Peturb( target.s_target, 210.0, a.s.ic[0], a.s.ic[0] + 405 ) ;
+        a.s.ec[1] = (!i) ? MAX_SPEED : PeturbDown( MAX_SPEED, MAX_SPEED/2.0 , 0, MAX_SPEED ) ;
+        a.s.ec[0] = (!i) ? target.s_target : Peturb( target.s_target, 210.0, a.s.ic[0], a.s.ic[0] + 405 ) ;
       } else {
-        a.s.ec[1] = (!i) ? f_speed  : Peturb( f_speed, MAX_SPEED/2.0, 0, MAX_SPEED ) ;
-        a.s.ec[0] = (!i) ? target.s_target : Peturb( target.s_target, 12.5, target.s_target-25.0, target.s_target + 25.0 ) ;
+        a.s.ec[1] = (!i) ? f_speed  : Peturb( f_speed , MAX_SPEED/2.0, 0, MAX_SPEED ) ;
+        a.s.ec[0] = (!i) ? target.s_target : Peturb( target.s_target, 12.5, target.s_target-25.0, target.s_target+25.0 ) ;
       }
 
 
